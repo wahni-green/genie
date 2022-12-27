@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include genie *.css
+recursive-include genie *.csv
+recursive-include genie *.html
+recursive-include genie *.ico
+recursive-include genie *.js
+recursive-include genie *.json
+recursive-include genie *.md
+recursive-include genie *.png
+recursive-include genie *.py
+recursive-include genie *.svg
+recursive-include genie *.txt
+recursive-exclude genie *.pyc
