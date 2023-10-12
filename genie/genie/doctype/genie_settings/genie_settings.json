@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "creation": "2023-10-12 19:45:56.953475",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enable_ticket_raising",
+  "column_break_nuxg",
+  "support_portal_section",
+  "support_url",
+  "column_break_vhlc",
+  "support_api_token"
+ ],
+ "fields": [
+  {
+   "collapsible": 1,
+   "depends_on": "enable_ticket_raising",
+   "fieldname": "support_portal_section",
+   "fieldtype": "Section Break",
+   "label": "Support Portal"
+  },
+  {
+   "description": "Example: https://support.frappe.io",
+   "fieldname": "support_url",
+   "fieldtype": "Data",
+   "label": "URL",
+   "mandatory_depends_on": "enable_ticket_raising"
+  },
+  {
+   "fieldname": "column_break_vhlc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_nuxg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_ticket_raising",
+   "fieldtype": "Check",
+   "label": "Enable Ticket Raising"
+  },
+  {
+   "fieldname": "support_api_token",
+   "fieldtype": "Password",
+   "label": "API Token",
+   "mandatory_depends_on": "enable_ticket_raising"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-10-12 20:09:33.452895",
+ "modified_by": "Administrator",
+ "module": "Genie",
+ "name": "Genie Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

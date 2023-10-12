@@ -5,3 +5,4 @@
 tags
 genie/docs/current
 node_modules/
+genie/public/dist/*
