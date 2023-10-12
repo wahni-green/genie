@@ -92,6 +92,7 @@ genie.SupportTicket = class SupportTicket {
 
 		frappe.call({
 			method: "genie.utils.support.create_ticket",
+			type: "POST",
 			args: {
 				"title": values.ticket_title,
 				"description": values.ticket_description,

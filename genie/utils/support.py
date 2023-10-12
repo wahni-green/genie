@@ -34,8 +34,9 @@ def create_ticket(title, description, screen_recording=None):
 			},
 			"attachments": [hd_ticket_file] if hd_ticket_file else [],
 		}
-	).json().get("message")
-	return hd_ticket["name"]
+	).json().get("message", {}).get("name")
+
+	return hd_ticket
 
 
 def upload_file(content):
