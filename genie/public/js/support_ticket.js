@@ -59,7 +59,7 @@ genie.SupportTicket = class SupportTicket {
 							})
 						} else {
 							this.startRecording();
-							this.setIndicator("spinner-grow text-danger");
+							this.setIndicator("spinner-grow text-danger align-self-center mr-2");
 							this.dialog.set_df_property("record_screen", "label", "Stop Recording");
 							this.dialog.set_df_property("view_recording", "hidden", 1);
 							this.dialog.set_df_property("clear_recording", "hidden", 1);
@@ -140,6 +140,7 @@ genie.SupportTicket = class SupportTicket {
 	setIndicator(indicator) {
 		this.dialog.header
 			.find(".indicator")
+			.css({ width: "1rem", height: '1rem'})
 			.removeClass()
 			.addClass("indicator " + (indicator || "hidden"));
 	}
