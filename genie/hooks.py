@@ -45,6 +45,9 @@ app_include_js = ["genie.bundle.js"]
 #	"Role": "home_page"
 # }
 
+# Boot Info
+extend_bootinfo = "genie.boot.set_bootinfo"
+
 # Generators
 # ----------
 
