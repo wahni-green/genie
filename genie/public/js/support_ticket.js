@@ -45,16 +45,20 @@ genie.SupportTicket = class SupportTicket {
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
 							this.recorder.stop();
+							this.setIndicator();
 							this.dialog.set_df_property("record_screen", "label", "Start Recording")
 							this.dialog.set_df_property("view_recording", "hidden", 0);
+							this.dialog.set_df_property("clear_recording", "hidden", 0);
 							frappe.show_alert({
 								indicator: "green",
 								message: __(`Screen recording has stopped. Please click on "View Recording" to view the recording.`)
 							})
 						} else {
 							this.startRecording();
+							this.setIndicator("spinner-grow text-danger");
 							this.dialog.set_df_property("record_screen", "label", "Stop Recording");
 							this.dialog.set_df_property("view_recording", "hidden", 1);
+							this.dialog.set_df_property("clear_recording", "hidden", 1);
 							frappe.show_alert({
 								indicator: "green",
 								message: __(`Screen recording has started. Please click on "Stop Recording" once you are done.`)
@@ -71,23 +75,77 @@ genie.SupportTicket = class SupportTicket {
 					click: () => {
 						window.open(genie.blobURL, "_blank");
 					}
+				},
+				{
+					fieldname: "clear_recording",
+					label: __("Clear Recording"),
+					fieldtype: "Button",
+					hidden: 1,
+					click: () => {
+						if (this.recorder && this.recorder.state == "recording") {
+							frappe.show_alert({
+								indicator: "red",
+								message: __("Please stop the recording before clearing.")
+							});
+							return;
+						}
+
+						genie.chunks = [];
+						genie.blob = null;
+						genie.blobURL = null;
+
+						this.dialog.set_df_property("record_screen", "label", "Start Recording")
+						this.dialog.set_df_property("view_recording", "hidden", 1);
+						this.dialog.set_df_property("clear_recording", "hidden", 1);
+
+						frappe.show_alert({
+							indicator: "green",
+							message: __("Screen recording have been cleared.")
+						});
+					}
 				}
 			],
 			primary_action_label: __("Raise Ticket"),
 			primary_action: (values) => {
+				if (this.recorder && this.recorder.state == "recording") {
+					frappe.show_alert({
+						indicator: "red",
+						message: __("Please stop the recording before raising the ticket.")
+					});
+					return;
+				}
 				this.raise_ticket(values);
 			},
 			secondary_action_label: __("Cancel"),
 			secondary_action: () => {
+				if (this.recorder && this.recorder.state == "recording") {
+					frappe.show_alert({
+						indicator: "red",
+						message: __("Please stop the recording before cancelling.")
+					});
+					return;
+				}
 				this.dialog.hide();
 			}
 		});
+
+		this.dialog.$wrapper.find(".modal-dialog").css("z-index", 1);
+		this.dialog.get_minimize_btn().addClass("pr-3");
+	}
+
+	setIndicator(indicator) {
+		this.dialog.header
+			.find(".indicator")
+			.removeClass()
+			.addClass("indicator " + (indicator || "hidden"));
 	}
 
 	async raise_ticket(values) {
 		let screen_recording = null;
 		if (genie.blob) {
 			screen_recording = await this.blobToBase64(genie.blob);
+			screen_recording = await genie.UploadFile(genie.blob);
+			if (!screen_recording) return;
 		}
 
 		frappe.call({

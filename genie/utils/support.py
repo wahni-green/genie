@@ -1,9 +1,9 @@
 # Copyright (c) 2023, Wahni IT Solutions Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-import requests
 import frappe
 from frappe.utils import get_url, now
+from genie.utils.requests import make_request
 
 
 @frappe.whitelist()
@@ -15,26 +15,24 @@ def create_ticket(title, description, screen_recording=None):
 
 	hd_ticket_file = None
 	if screen_recording:
-		screen_recording = upload_file(screen_recording)
-		hd_ticket_file = requests.post(
-			f"{settings.support_url}/api/method/upload_file",
+		screen_recording = f"{get_url()}{screen_recording}"
+		hd_ticket_file = make_request(
+			url=f"{settings.support_url}/api/method/upload_file",
 			headers=headers,
-			json={
-				"file_url": screen_recording,
-			}
-		).json().get("message")
+			payload={"file_url": screen_recording}
+		).get("message")
 
-	hd_ticket = requests.post(
-		f"{settings.support_url}/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
+	hd_ticket = make_request(
+		url=f"{settings.support_url}/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
 		headers=headers,
-		json={
+		payload={
 			"doc": {
 				"description": description,
 				"subject": title,
 			},
 			"attachments": [hd_ticket_file] if hd_ticket_file else [],
 		}
-	).json().get("message", {}).get("name")
+	).get("message", {}).get("name")
 
 	return hd_ticket
 
