@@ -10,8 +10,8 @@
   "column_break_nuxg",
   "support_portal_section",
   "support_url",
-  "column_break_vhlc",
-  "support_api_token"
+  "support_api_token",
+  "ticket_details"
  ],
  "fields": [
   {
@@ -26,10 +26,6 @@
    "fieldtype": "Data",
    "label": "URL",
    "mandatory_depends_on": "enable_ticket_raising"
-  },
-  {
-   "fieldname": "column_break_vhlc",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "column_break_nuxg",
@@ -47,11 +43,17 @@
    "fieldtype": "Password",
    "label": "API Token",
    "mandatory_depends_on": "enable_ticket_raising"
+  },
+  {
+   "fieldname": "ticket_details",
+   "fieldtype": "Table",
+   "label": "Ticket Details",
+   "options": "Support Ticket Details"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-10-13 14:37:44.771719",
+ "modified": "2023-10-13 19:54:22.523137",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
