@@ -141,6 +141,9 @@ genie.SupportTicket = class SupportTicket {
 	}
 
 	async raise_ticket(values) {
+		if (this.inUpload) return;
+
+		this.inUpload = true;
 		let screen_recording = null;
 		if (genie.blob) {
 			screen_recording = await this.blobToBase64(genie.blob);
@@ -148,6 +151,7 @@ genie.SupportTicket = class SupportTicket {
 			if (!screen_recording) return;
 		}
 
+		this.inUpload = false;
 		frappe.call({
 			method: "genie.utils.support.create_ticket",
 			type: "POST",
@@ -179,6 +183,7 @@ genie.SupportTicket = class SupportTicket {
 		this.mixedStream = null;
 		this.recorder = null;
 		this.recordedVideo = null;
+		this.inUpload = false;
 
 		genie.chunks = [];
 		genie.blob = null;
