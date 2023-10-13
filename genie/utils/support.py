@@ -2,7 +2,8 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.utils import get_url, now
+from frappe.utils import cint, flt, get_url, now
+from frappe.utils.safe_exec import get_safe_globals, safe_eval
 from genie.utils.requests import make_request
 
 
@@ -29,12 +30,36 @@ def create_ticket(title, description, screen_recording=None):
 			"doc": {
 				"description": description,
 				"subject": title,
+				**generate_ticket_details(settings),
 			},
 			"attachments": [hd_ticket_file] if hd_ticket_file else [],
 		}
 	).get("message", {}).get("name")
 
 	return hd_ticket
+
+
+def generate_ticket_details(settings):
+	req_params = {}
+	for row in settings.ticket_details:
+		if row.type == "String":
+			req_params[row.key] = row.value
+		elif row.type == "Integer":
+			req_params[row.key] = cint(row.value)
+		elif row.type == "Context":
+			req_params[row.key] = safe_eval(row.value, get_safe_globals(), {})
+		else:
+			req_params[row.key] = row.value
+
+		if row.cast_to:
+			if row.cast_to == "Int":
+				req_params[row.key] = cint(req_params[row.key])
+			elif row.cast_to == "String":
+				req_params[row.key] = str(req_params[row.key])
+			elif row.cast_to == "Float":
+				req_params[row.key] = flt(req_params[row.key])
+
+	return req_params
 
 
 def upload_file(content):
