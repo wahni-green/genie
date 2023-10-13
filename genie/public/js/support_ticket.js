@@ -10,6 +10,10 @@ genie.blobURL = null;
 
 genie.SupportTicket = class SupportTicket {
 	constructor() {
+		if (!frappe.boot.genie_support_enabled) {
+			frappe.msgprint(__("Ticket raising is not enabled for this site."));
+			return;
+		}
 		this.init_config();
 		this.setup_dialog();
 		this.dialog.show();

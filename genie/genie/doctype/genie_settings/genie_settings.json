@@ -15,7 +15,6 @@
  ],
  "fields": [
   {
-   "collapsible": 1,
    "depends_on": "enable_ticket_raising",
    "fieldname": "support_portal_section",
    "fieldtype": "Section Break",
@@ -43,6 +42,7 @@
    "label": "Enable Ticket Raising"
   },
   {
+   "description": "Format: api_key:api_secret",
    "fieldname": "support_api_token",
    "fieldtype": "Password",
    "label": "API Token",
@@ -51,7 +51,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-10-12 20:09:33.452895",
+ "modified": "2023-10-13 14:37:44.771719",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
