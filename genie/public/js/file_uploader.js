@@ -14,7 +14,8 @@ genie.UploadFile = function (file) {
         })
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
-                console.log(`Upload in progress. ${e.loaded}`)
+                console.log(`Upload in progress. ${e.loaded} / ${e.total}`)
+                frappe.show_progress("Uploading", e.loaded, e.total, "", true);
             }
         })
         xhr.addEventListener('error', (e) => {
