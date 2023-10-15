@@ -10,7 +10,11 @@
   "column_break_nuxg",
   "support_portal_section",
   "support_url",
+  "save_recording",
+  "column_break_atib",
   "support_api_token",
+  "max_recording_size",
+  "section_break_tazx",
   "ticket_details"
  ],
  "fields": [
@@ -49,11 +53,31 @@
    "fieldtype": "Table",
    "label": "Ticket Details",
    "options": "Support Ticket Details"
+  },
+  {
+   "fieldname": "column_break_atib",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "save_recording",
+   "fieldtype": "Select",
+   "label": "Save Recording",
+   "options": "Public\nPrivate"
+  },
+  {
+   "depends_on": "enable_ticket_raising",
+   "fieldname": "section_break_tazx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "max_recording_size",
+   "fieldtype": "Int",
+   "label": "Max Recording Size(MB)"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-10-13 19:54:22.523137",
+ "modified": "2023-10-15 14:47:21.063993",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",

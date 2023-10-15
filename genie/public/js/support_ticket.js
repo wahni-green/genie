@@ -48,25 +48,9 @@ genie.SupportTicket = class SupportTicket {
 					fieldtype: "Button",
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
-							this.recorder.stop();
-							this.setIndicator();
-							this.dialog.set_df_property("record_screen", "label", "Start Recording")
-							this.dialog.set_df_property("view_recording", "hidden", 0);
-							this.dialog.set_df_property("clear_recording", "hidden", 0);
-							frappe.show_alert({
-								indicator: "green",
-								message: __(`Screen recording has stopped. Please click on "View Recording" to view the recording.`)
-							})
+							this.stopRecording();
 						} else {
 							this.startRecording();
-							this.setIndicator("spinner-grow text-danger align-self-center mr-2");
-							this.dialog.set_df_property("record_screen", "label", "Stop Recording");
-							this.dialog.set_df_property("view_recording", "hidden", 1);
-							this.dialog.set_df_property("clear_recording", "hidden", 1);
-							frappe.show_alert({
-								indicator: "green",
-								message: __(`Screen recording has started. Please click on "Stop Recording" once you are done.`)
-							})
 						}
 					}
 				},
@@ -146,14 +130,26 @@ genie.SupportTicket = class SupportTicket {
 	}
 
 	async raise_ticket(values) {
+		console.log(this.inUpload)
 		if (this.inUpload) return;
 
 		this.inUpload = true;
 		let screen_recording = null;
 		if (genie.blob) {
+			frappe.show_alert({
+				indicator: "yellow",
+				message: __("Raising ticket. Please wait..."),
+			})
 			screen_recording = await this.blobToBase64(genie.blob);
 			screen_recording = await genie.UploadFile(genie.blob);
-			if (!screen_recording) return;
+			if (!screen_recording) {
+				frappe.show_alert({
+					indicator: "red",
+					message: __("Error raising ticket. Please try again."),
+				})
+				this.inUpload = false;
+				return;
+			}
 		}
 
 		this.inUpload = false;
@@ -172,7 +168,7 @@ genie.SupportTicket = class SupportTicket {
 					frappe.show_alert({
 						indicator: "green",
 						message: __("Ticket raised successfully"),
-					})
+					});
 					this.dialog.hide();
 					frappe.msgprint(
 						__(`Your ticket(#${r.message}) has been raised successfully. You will be notified once it is resolved.`)
@@ -193,6 +189,10 @@ genie.SupportTicket = class SupportTicket {
 		genie.chunks = [];
 		genie.blob = null;
 		genie.blobURL = null;
+
+		this.maxFileSizeInBytes = frappe.boot.genie_max_file_size * 1024 * 1024;
+		this.sizeWarning = (frappe.boot.genie_max_file_size / 4) * 1024 * 1024;
+		this.nextWarningSize = this.sizeWarning;
 	}
 
 	async setupStream() {
@@ -222,12 +222,60 @@ genie.SupportTicket = class SupportTicket {
 			this.recorder = new MediaRecorder(this.mixedStream);
 			this.recorder.ondataavailable = (e) => {
 				genie.chunks.push(e.data);
+				this.checkFileSize();
 			};
 			this.recorder.onstop = this.handleStop;
 			this.recorder.start(1000);
 			console.log('Recording started');
+
+			this.setIndicator("spinner-grow text-danger align-self-center mr-2");
+			this.dialog.set_df_property("record_screen", "label", "Stop Recording");
+			this.dialog.set_df_property("view_recording", "hidden", 1);
+			this.dialog.set_df_property("clear_recording", "hidden", 1);
+			frappe.show_alert({
+				indicator: "green",
+				message: __(`Screen recording has started. Please click on "Stop Recording" once you are done.`)
+			})
 		} else {
 			console.warn('No stream available.');
+			frappe.show_alert({
+				indicator: "red",
+				message: __("Error starting screen recording. Please try again.")
+			});
+		}
+	}
+
+	stopRecording() {
+		this.recorder.stop();
+		this.setIndicator();
+		this.dialog.set_df_property("record_screen", "label", "Start Recording")
+		this.dialog.set_df_property("view_recording", "hidden", 0);
+		this.dialog.set_df_property("clear_recording", "hidden", 0);
+		frappe.show_alert({
+			indicator: "green",
+			message: __(`Screen recording has stopped. Please click on "View Recording" to view the recording.`)
+		})
+	}
+
+	checkFileSize() {
+		const totalSize = genie.chunks.reduce((acc, chunk) => acc + chunk.size, 0);
+
+		if (totalSize >= this.maxFileSizeInBytes) {
+			frappe.show_alert({
+				indicator: "red",
+				message: __("Screen recording size has exceeded the maximum allowed size. Recording has been stopped.")
+			});
+			this.stopRecording();
+			return;
+		}
+
+
+		if (totalSize >= this.nextWarningSize) {
+			frappe.show_alert({
+				indicator: "yellow",
+				message: __(`Screen recording size has exceeded ${(totalSize / (1024 * 1024)).toFixed(1)}MB.`)
+			});
+			this.nextWarningSize += this.sizeWarning;
 		}
 	}
 

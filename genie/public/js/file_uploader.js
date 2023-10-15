@@ -14,7 +14,8 @@ genie.UploadFile = function (file) {
         })
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
-                console.log(`Upload in progress. ${e.loaded}`)
+                console.log(`Upload in progress. ${e.loaded} / ${e.total}`)
+                frappe.show_progress("Uploading", e.loaded, e.total, "", true);
             }
         })
         xhr.addEventListener('error', (e) => {
@@ -67,7 +68,7 @@ genie.UploadFile = function (file) {
 
         let form_data = new FormData();
         form_data.append('file', file, "screen_recording.mp4");
-        form_data.append('is_private', false);
+        form_data.append('is_private', frappe.boot.genie_file_type);
         form_data.append('folder', 'Home');
 
         xhr.send(form_data);
