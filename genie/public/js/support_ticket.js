@@ -190,8 +190,8 @@ genie.SupportTicket = class SupportTicket {
 		genie.blob = null;
 		genie.blobURL = null;
 
-		this.maxFileSizeInBytes = 16 * 1024 * 1024; // 15MB
-		this.sizeWarning = 4 * 1024 * 1024; // 4MB
+		this.maxFileSizeInBytes = frappe.boot.genie_max_file_size * 1024 * 1024;
+		this.sizeWarning = (frappe.boot.genie_max_file_size / 4) * 1024 * 1024;
 		this.nextWarningSize = this.sizeWarning;
 	}
 
@@ -260,7 +260,7 @@ genie.SupportTicket = class SupportTicket {
 	checkFileSize() {
 		const totalSize = genie.chunks.reduce((acc, chunk) => acc + chunk.size, 0);
 
-		if (this.totalSize >= this.maxFileSizeInBytes) {
+		if (totalSize >= this.maxFileSizeInBytes) {
 			frappe.show_alert({
 				indicator: "red",
 				message: __("Screen recording size has exceeded the maximum allowed size. Recording has been stopped.")
