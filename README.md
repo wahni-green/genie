@@ -6,11 +6,7 @@ Your guide to unlocking full potential of ERPNext.
 
 With Genie, it's easy to raise a support ticket with screen and audio recording right from withing your system.
 
-
-
-https://github.com/wahni-green/genie/assets/52111700/e946162e-ab66-456d-a546-4d918ac52d78
-
-
+[Genie.webm](https://github.com/wahni-green/genie/assets/52111700/224de4b8-c7b7-40bb-9299-0e0cc63a63b0)
 
 
 ### How to enable ticket raising?
