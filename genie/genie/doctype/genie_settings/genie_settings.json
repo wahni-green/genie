@@ -8,6 +8,7 @@
  "field_order": [
   "enable_ticket_raising",
   "column_break_nuxg",
+  "enable_user_impersonation",
   "support_portal_section",
   "support_url",
   "support_api_token",
@@ -49,11 +50,17 @@
    "fieldtype": "Table",
    "label": "Ticket Details",
    "options": "Support Ticket Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_user_impersonation",
+   "fieldtype": "Check",
+   "label": "Enable User Impersonation"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-10-13 19:54:22.523137",
+ "modified": "2023-11-18 11:41:53.318912",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
