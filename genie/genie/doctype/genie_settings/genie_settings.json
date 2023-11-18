@@ -8,6 +8,7 @@
  "field_order": [
   "enable_ticket_raising",
   "column_break_nuxg",
+  "enable_user_impersonation",
   "support_portal_section",
   "support_url",
   "save_recording",
@@ -73,11 +74,17 @@
    "fieldname": "max_recording_size",
    "fieldtype": "Int",
    "label": "Max Recording Size(MB)"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_user_impersonation",
+   "fieldtype": "Check",
+   "label": "Enable User Impersonation"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-10-15 14:47:21.063993",
+ "modified": "2023-11-18 11:41:53.318912",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
