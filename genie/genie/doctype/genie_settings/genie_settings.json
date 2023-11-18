@@ -11,7 +11,11 @@
   "enable_user_impersonation",
   "support_portal_section",
   "support_url",
+  "save_recording",
+  "column_break_atib",
   "support_api_token",
+  "max_recording_size",
+  "section_break_tazx",
   "ticket_details"
  ],
  "fields": [
@@ -50,6 +54,26 @@
    "fieldtype": "Table",
    "label": "Ticket Details",
    "options": "Support Ticket Details"
+  },
+  {
+   "fieldname": "column_break_atib",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "save_recording",
+   "fieldtype": "Select",
+   "label": "Save Recording",
+   "options": "Public\nPrivate"
+  },
+  {
+   "depends_on": "enable_ticket_raising",
+   "fieldname": "section_break_tazx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "max_recording_size",
+   "fieldtype": "Int",
+   "label": "Max Recording Size(MB)"
   },
   {
    "default": "0",
