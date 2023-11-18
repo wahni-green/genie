@@ -67,13 +67,19 @@ extend_bootinfo = "genie.boot.set_bootinfo"
 # ------------
 
 # before_install = "genie.install.before_install"
-# after_install = "genie.install.after_install"
+after_install = "genie.setup.install.after_install"
 
 # Uninstallation
 # ------------
 
 # before_uninstall = "genie.uninstall.before_uninstall"
 # after_uninstall = "genie.uninstall.after_uninstall"
+
+
+# Migration
+# ------------
+after_migrate = "genie.setup.migrate.after_migrate"
+
 
 # Desk Notifications
 # ------------------

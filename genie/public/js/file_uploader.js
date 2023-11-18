@@ -67,9 +67,9 @@ genie.UploadFile = function (file) {
         xhr.setRequestHeader('X-Frappe-CSRF-Token', frappe.csrf_token);
 
         let form_data = new FormData();
-        form_data.append('file', file, "screen_recording.mp4");
+        form_data.append('file', file, `screen-rec-${Date.now()}.mp4`);
         form_data.append('is_private', frappe.boot.genie_file_type);
-        form_data.append('folder', 'Home');
+        form_data.append('folder', 'Home/Genie');
 
         xhr.send(form_data);
     });

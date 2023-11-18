@@ -1,0 +1,4 @@
+[pre_model_sync]
+
+[post_model_sync]
+genie.patches.add_custom_field_generated_by_genie
