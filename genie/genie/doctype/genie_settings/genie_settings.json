@@ -12,9 +12,12 @@
   "support_portal_section",
   "support_url",
   "save_recording",
+  "enable_portal_access",
   "column_break_atib",
   "support_api_token",
   "max_recording_size",
+  "portal_user",
+  "portal_user_password",
   "section_break_tazx",
   "ticket_details"
  ],
@@ -80,11 +83,31 @@
    "fieldname": "enable_user_impersonation",
    "fieldtype": "Check",
    "label": "Enable User Impersonation"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_portal_access",
+   "fieldtype": "Check",
+   "label": "Enable Portal Access"
+  },
+  {
+   "depends_on": "enable_portal_access",
+   "fieldname": "portal_user",
+   "fieldtype": "Data",
+   "label": "Portal User",
+   "mandatory_depends_on": "enable_portal_access"
+  },
+  {
+   "depends_on": "enable_portal_access",
+   "fieldname": "portal_user_password",
+   "fieldtype": "Password",
+   "label": "Portal User Password",
+   "mandatory_depends_on": "enable_portal_access"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-11-18 11:41:53.318912",
+ "modified": "2024-12-28 12:55:29.461125",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
