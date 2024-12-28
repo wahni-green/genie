@@ -74,3 +74,23 @@ def upload_file(content):
 	).save(ignore_permissions=True).file_url
 
 	return f"{get_url()}{file_url}"
+
+
+@frappe.whitelist()
+def get_portal_url():
+	settings = frappe.get_cached_doc("Genie Settings")
+	headers = {
+		"Authorization": f"token {settings.get_password('support_api_token')}",
+	}
+
+	response = make_request(
+		url=f"{settings.support_url}/api/method/frappe.auth.get_logged_user",
+		headers=headers,
+		payload={},
+		return_response=True
+	)
+
+	sid = response.cookies.get("sid")
+	return {
+		"url": f"{settings.support_url}/helpdesk?sid={sid}"
+	}
