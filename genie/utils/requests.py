@@ -6,12 +6,20 @@ import frappe
 from frappe.integrations.utils import create_request_log
 
 
-def make_request(url, headers, payload, req_type="POST"):
+def make_request(
+	url,
+	headers,
+	payload,
+	req_type="POST",
+	return_response=False
+):
 	response = requests.request(
 		req_type, url, json=payload, headers=headers
 	)
 	log_request(url, payload, response.json() if response.status_code == 200 else response.text)
 	response.raise_for_status()
+	if return_response:
+		return response
 	return response.json()
 
 
