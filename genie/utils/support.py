@@ -79,14 +79,15 @@ def upload_file(content):
 @frappe.whitelist()
 def get_portal_url():
 	settings = frappe.get_cached_doc("Genie Settings")
-	headers = {
-		"Authorization": f"token {settings.get_password('support_api_token')}",
-	}
-
 	response = make_request(
-		url=f"{settings.support_url}/api/method/frappe.auth.get_logged_user",
-		headers=headers,
-		payload={},
+		url=f"{settings.support_url}/api/method/login",
+		headers={
+			"Content-Type": "application/json",
+		},
+		payload={
+			"usr": settings.get_password("portal_user"),
+			"pwd": settings.get_password("portal_user_password"),
+		},
 		return_response=True
 	)
 
