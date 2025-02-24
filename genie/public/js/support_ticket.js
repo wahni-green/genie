@@ -33,6 +33,31 @@ genie.SupportTicket = class SupportTicket {
 					reqd: 1
 				},
 				{
+					fieldname: "ticket_status",
+					label: __("Status"),
+					fieldtype: "Data",
+					reqd: 1,
+					default: "Resolution Pending"
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("User Details")
+				},
+				{
+					fieldname: "ticket_user",
+					label: __("User"),
+					fieldtype: "Data",
+					reqd: 1,
+					default: frappe.session.user
+				},
+				{
+					fieldname: "ticket_whatsapp",
+					label: __("Whatsapp Number"),
+					fieldtype: "Data",
+					reqd: 1,
+				},
+				
+				{
 					fieldname: "ticket_description",
 					label: __("Description"),
 					fieldtype: "Text Editor",
@@ -158,8 +183,12 @@ genie.SupportTicket = class SupportTicket {
 			type: "POST",
 			args: {
 				"title": values.ticket_title,
+				"status":"Open",
+				"user":values.ticket_user,
+				"whatsapp_no":values.ticket_whatsapp,
 				"description": values.ticket_description,
-				"screen_recording": screen_recording
+				"screen_recording": screen_recording,
+
 			},
 			freeze: true,
 			freeze_message: __("Creating ticket..."),
