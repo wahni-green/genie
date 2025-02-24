@@ -1,0 +1,99 @@
+{
+ "actions": [],
+ "creation": "2025-02-24 15:42:41.388337",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "user",
+  "column_break_mxda",
+  "status",
+  "whatsapp_number",
+  "description_section",
+  "text_editor_fyxp",
+  "section_break_mxut",
+  "video_file",
+  "external_ticket_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Data",
+   "label": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mxda",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "whatsapp_number",
+   "fieldtype": "Data",
+   "label": "Whatsapp Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "description_section",
+   "fieldtype": "Section Break",
+   "label": "Description"
+  },
+  {
+   "fieldname": "text_editor_fyxp",
+   "fieldtype": "Text Editor",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_mxut",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "video_file",
+   "fieldtype": "Data",
+   "label": "Video File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "external_ticket_id",
+   "fieldtype": "Data",
+   "label": "External Ticket Id",
+   "read_only": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-02-24 16:22:48.541657",
+ "modified_by": "Administrator",
+ "module": "Genie",
+ "name": "Support Ticket",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

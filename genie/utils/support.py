@@ -13,7 +13,6 @@ def create_ticket(title, description, status, user, whatsapp_no, screen_recordin
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",
 	}
-	
 	hd_ticket_file = None
 	if screen_recording:
 		screen_recording = f"{get_url()}{screen_recording}"
@@ -38,7 +37,21 @@ def create_ticket(title, description, status, user, whatsapp_no, screen_recordin
 			"attachments": [hd_ticket_file] if hd_ticket_file else [],
 		}
 	).get("message", {}).get("name")
-
+	frappe.log(hd_ticket)
+     # Insert into 'Support Ticket' Doctype
+	if hd_ticket:
+		support_ticket = frappe.get_doc({
+            "doctype": "Support Ticket",
+            "title": title,
+            "description": description,
+            "status": status,
+            "user": user,
+            "whatsapp_number": whatsapp_no,
+            "video_file": screen_recording if screen_recording else "",
+            "external_ticket_id": hd_ticket  # Save external ticket ID for reference
+        })
+		support_ticket.insert(ignore_permissions=True)
+		frappe.db.commit()
 	return hd_ticket
 
 
