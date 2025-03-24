@@ -65,12 +65,13 @@ genie.SupportTicket = class SupportTicket {
 				},
 				{
 					fieldtype: "Section Break",
-					label: __("Screen Recording (Prefer to speak? Raise your issue using voice while recording.)")
+					label: __("Screen Recording")
 				},
 				{
 					fieldname: "record_screen",
 					label: __("Start Recording"),
 					fieldtype: "Button",
+					description:"Prefer to speak? Raise your issue using voice while recording.",
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
 							this.stopRecording();
