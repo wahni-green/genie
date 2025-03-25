@@ -45,12 +45,19 @@ genie.SupportTicket = class SupportTicket {
 					
 				},
 				{
+					fieldtype: "Column Break"
+				},
+				{
 					fieldname: "ticket_whatsapp",
 					label: __("Whatsapp Number"),
 					fieldtype: "Data",
+					description:"(Country code is mandatory.)"
 					
 				},
-				
+				{
+					fieldtype: "Section Break",
+					label: __("Description")
+				},
 				{
 					fieldname: "ticket_description",
 					label: __("Description"),
@@ -60,6 +67,15 @@ genie.SupportTicket = class SupportTicket {
 				{
 					fieldtype: "Section Break",
 					label: __("Screen Recording")
+				},
+				{
+					label: 'Hidden Field',
+					fieldtype: 'Data',
+					hidden: 1,
+					read_only: 1
+				},
+				{
+					fieldtype: "Column Break"
 				},
 				{
 					fieldname: "record_screen",
