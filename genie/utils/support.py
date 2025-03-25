@@ -37,7 +37,6 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
 			"attachments": [hd_ticket_file] if hd_ticket_file else [],
 		}
 	).get("message", {}).get("name")
-	frappe.log(hd_ticket)
      # Insert into 'Support Ticket' Doctype
 	if hd_ticket:
 		support_ticket = frappe.get_doc({
@@ -49,7 +48,6 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
             "video_file": screen_recording if screen_recording else "",
             "external_ticket_id": hd_ticket  # Save external ticket ID for reference
         })
-		frappe.logger(support_ticket, 'Support Ticket Respo')
 		support_ticket.insert(ignore_permissions=True)
 		frappe.db.commit()
 	return hd_ticket
