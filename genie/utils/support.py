@@ -29,7 +29,6 @@ def create_ticket(title, description, status, user, whatsapp_no, screen_recordin
 			"doc": {
 				"description": description,
 				"subject": title,
-				"status":status,
 				"user":user,
 				"whatsapp_no":whatsapp_no,
 				**generate_ticket_details(settings),
@@ -44,7 +43,6 @@ def create_ticket(title, description, status, user, whatsapp_no, screen_recordin
             "doctype": "Support Ticket",
             "title": title,
             "description": description,
-            "status": status,
             "user": user,
             "whatsapp_number": whatsapp_no,
             "video_file": screen_recording if screen_recording else "",

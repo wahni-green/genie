@@ -33,28 +33,22 @@ genie.SupportTicket = class SupportTicket {
 					reqd: 1
 				},
 				{
-					fieldname: "ticket_status",
-					label: __("Status"),
-					fieldtype: "Data",
-					reqd: 1,
-					default: "Resolution Pending"
-				},
-				{
 					fieldtype: "Section Break",
 					label: __("User Details")
 				},
 				{
 					fieldname: "ticket_user",
 					label: __("User"),
-					fieldtype: "Data",
+					fieldtype: "Read Only",
 					reqd: 1,
-					default: frappe.session.user
+					default: frappe.session.user,
+					
 				},
 				{
 					fieldname: "ticket_whatsapp",
 					label: __("Whatsapp Number"),
 					fieldtype: "Data",
-					reqd: 1,
+					
 				},
 				
 				{
@@ -65,12 +59,13 @@ genie.SupportTicket = class SupportTicket {
 				},
 				{
 					fieldtype: "Section Break",
-					label: __("Screen Recording (Prefer to speak? Raise your issue using voice while recording.)")
+					label: __("Screen Recording")
 				},
 				{
 					fieldname: "record_screen",
 					label: __("Start Recording"),
 					fieldtype: "Button",
+					description:"Prefer to speak? Raise your issue using voice while recording.",
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
 							this.stopRecording();
@@ -86,7 +81,6 @@ genie.SupportTicket = class SupportTicket {
 					label: __("View Recording"),
 					fieldtype: "Button",
 					hidden: 1,
-					description:"Prefer to speak? Raise your issue using voice while recording.",
 					click: () => {
 						window.open(genie.blobURL, "_blank");
 					}
