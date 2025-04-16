@@ -22,9 +22,11 @@
 							{%= __("Impersonating {0}", [frappe.boot.user.name]) %}
 						</span>
 					{% } %}
+					{% if (frappe.boot.genie_support_enabled) { %}
                     <div>
                         <button class="btn btn-primary btn-sm" id="bts_support_btn" onclick="new genie.SupportTicket()"><span class="ui-button-text">BTS Tech Support</span></button>
                     </div>
+					{% } %}
 					<div class="input-group search-bar text-muted hidden">
 						<input
 							id="navbar-search"
