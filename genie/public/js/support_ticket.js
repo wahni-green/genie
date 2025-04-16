@@ -33,6 +33,32 @@ genie.SupportTicket = class SupportTicket {
 					reqd: 1
 				},
 				{
+					fieldtype: "Section Break",
+					label: __("User Details")
+				},
+				{
+					fieldname: "ticket_user",
+					label: __("User"),
+					fieldtype: "Read Only",
+					reqd: 1,
+					default: frappe.session.user,
+					
+				},
+				{
+					fieldtype: "Column Break"
+				},
+				{
+					fieldname: "ticket_whatsapp",
+					label: __("Whatsapp Number"),
+					fieldtype: "Data",
+					description:"(Country code is mandatory.)"
+					
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("Description")
+				},
+				{
 					fieldname: "ticket_description",
 					label: __("Description"),
 					fieldtype: "Text Editor",
@@ -43,9 +69,19 @@ genie.SupportTicket = class SupportTicket {
 					label: __("Screen Recording")
 				},
 				{
+					label: 'Hidden Field',
+					fieldtype: 'Data',
+					hidden: 1,
+					read_only: 1
+				},
+				{
+					fieldtype: "Column Break"
+				},
+				{
 					fieldname: "record_screen",
 					label: __("Start Recording"),
 					fieldtype: "Button",
+					description:"Prefer to speak? Raise your issue using voice while recording.",
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
 							this.stopRecording();
@@ -54,6 +90,7 @@ genie.SupportTicket = class SupportTicket {
 						}
 					}
 				},
+				
 				{ fieldtype: "Column Break" },
 				{
 					fieldname: "view_recording",
@@ -158,8 +195,12 @@ genie.SupportTicket = class SupportTicket {
 			type: "POST",
 			args: {
 				"title": values.ticket_title,
+				"status":"Open",
+				"user":values.ticket_user,
+				"whatsapp_no":values.ticket_whatsapp,
 				"description": values.ticket_description,
-				"screen_recording": screen_recording
+				"screen_recording": screen_recording,
+
 			},
 			freeze: true,
 			freeze_message: __("Creating ticket..."),
