@@ -67,10 +67,16 @@
             </button>
             <div v-if="item.show" class="mt-3">
               <img
-                :src="item.chartImage"
-                alt="Workflow Chart"
-                class="img-fluid border rounded"
-              />
+                  :src="item.chartImage"
+                  alt="Workflow Chart"
+                  class="img-fluid border rounded cursor-pointer"
+                  @click="openZoom(item.chartImage)"
+                />
+
+            <!-- Zoom Modal -->
+            <div v-if="zoomImage" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" @click="zoomImage = null">
+              <img :src="zoomImage" class="max-w-full max-h-full border-4 border-white rounded shadow-lg" />
+            </div>
             </div>
           </div>
         </div>
@@ -88,6 +94,7 @@ export default {
       selectedProcess: "",
       selectedDepartment: "",
       departments: [], // dynamic from backend
+      zoomImage: null,
     };
   },
   computed: {
@@ -162,6 +169,9 @@ export default {
         },
       });
     },
+    openZoom(imageUrl) {
+      this.zoomImage = imageUrl;
+    },
   },
   mounted() {
     this.fetchDepartments();
@@ -206,5 +216,14 @@ export default {
 .clickable:hover {
   text-decoration: underline;
   opacity: 0.8;
+}
+.zoom-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 </style>

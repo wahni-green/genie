@@ -21,7 +21,7 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
 			headers=headers,
 			payload={"file_url": screen_recording}
 		).get("message")
-
+	user_full_name = frappe.get_value("User", user, "full_name") 
 	hd_ticket = make_request(
 		url=f"{settings.support_url}/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
 		headers=headers,
@@ -30,7 +30,8 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
 				"description": description,
 				"subject": title,
 				"status":status,
-				"user":user,
+				"ticket_user":user,
+				"full_name":user_full_name,
 				"whatsapp_no":whatsapp_no,
 				**generate_ticket_details(settings),
 			},
@@ -38,12 +39,14 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
 		}
 	).get("message", {}).get("name")
      # Insert into 'Support Ticket' Doctype
+    
 	if hd_ticket:
 		support_ticket = frappe.get_doc({
             "doctype": "Support Ticket",
             "title": title,
             "description": description,
-            "user": user,
+            "ticket_user": user,
+            "full_name":user_full_name,
             "whatsapp_number": whatsapp_no if whatsapp_no else "",
             "video_file": screen_recording if screen_recording else "",
             "external_ticket_id": hd_ticket  # Save external ticket ID for reference
