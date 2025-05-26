@@ -8,7 +8,7 @@ from genie.utils.requests import make_request
 
 
 @frappe.whitelist()
-def create_ticket(title, description, status, user, whatsapp_no=None, screen_recording=None):
+def create_ticket(title, description, status, email, user, whatsapp_no=None, screen_recording=None):
 	settings = frappe.get_cached_doc("Genie Settings")
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",
@@ -29,7 +29,9 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
 			"doc": {
 				"description": description,
 				"subject": title,
+				"Raised By": user,
 				"status":status,
+    			"email": email,
 				"user":user,
 				"whatsapp_no":whatsapp_no,
 				**generate_ticket_details(settings),
@@ -43,6 +45,7 @@ def create_ticket(title, description, status, user, whatsapp_no=None, screen_rec
             "doctype": "Support Ticket",
             "title": title,
             "description": description,
+            "email": email,
             "user": user,
             "whatsapp_number": whatsapp_no if whatsapp_no else "",
             "video_file": screen_recording if screen_recording else "",

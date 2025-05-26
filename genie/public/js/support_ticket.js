@@ -37,11 +37,22 @@ genie.SupportTicket = class SupportTicket {
 					label: __("User Details")
 				},
 				{
+					fieldname: "ticket_email",
+					label: __("Email"),
+					fieldtype: "Read Only",
+					reqd: 1,
+					default: frappe.session.user_email,
+					
+				},
+				{
+					fieldtype: "Column Break"
+				},
+				{
 					fieldname: "ticket_user",
 					label: __("User"),
 					fieldtype: "Read Only",
 					reqd: 1,
-					default: frappe.session.user,
+					default: frappe.session.user_fullname,
 					
 				},
 				{
@@ -196,6 +207,7 @@ genie.SupportTicket = class SupportTicket {
 			args: {
 				"title": values.ticket_title,
 				"status":"Open",
+				"email": values.ticket_email,
 				"user":values.ticket_user,
 				"whatsapp_no":values.ticket_whatsapp,
 				"description": values.ticket_description,
