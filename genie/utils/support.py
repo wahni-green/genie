@@ -29,7 +29,7 @@ def create_ticket(title, description, status, email, user, whatsapp_no=None, scr
 			"doc": {
 				"description": description,
 				"subject": title,
-				"Raised By": user,
+				"ticket_user": user,
 				"status":status,
     			"email": email,
 				"user":user,
