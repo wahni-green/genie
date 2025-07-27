@@ -56,25 +56,9 @@ def create_ticket(
 			},
 			"attachments": attachments,
 		}
-	).get("message", {})
+	).get("message", {}).get("name")
 
-	# Insert into 'Support Ticket' Doctype
-	if hd_ticket.get("name"):
-		support_ticket = frappe.get_doc({
-			"doctype": "Support Ticket",
-			"title": title,
-			"status": hd_ticket.get("status"),
-			"priority": hd_ticket.get("priority"),
-			"description": hd_ticket.get("description"),
-			"raised_by": user,
-			"user_fullname": user_fullname,
-			"video_file": screen_recording if screen_recording else "",
-			"file_attachment": file_attachment if file_attachment else "",
-			"external_ticket_id": hd_ticket.get("name")  # Save external ticket ID for reference
-		})
-		support_ticket.insert(ignore_permissions=True)
-
-	return hd_ticket.get("name")
+	return hd_ticket
 
 
 def generate_ticket_details(settings):
