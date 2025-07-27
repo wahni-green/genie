@@ -8,7 +8,15 @@ from genie.utils.requests import make_request
 
 
 @frappe.whitelist()
-def create_ticket(title, description, user, user_fullname, priority, file_attachment=None, screen_recording=None):
+def create_ticket(
+	title,
+	description,
+	screen_recording=None,
+	user=None,
+	user_fullname=None,
+	priority="Low",
+	file_attachment=None,
+):
 	settings = frappe.get_cached_doc("Genie Settings")
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",

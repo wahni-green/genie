@@ -41,7 +41,7 @@ genie.SupportTicket = class SupportTicket {
 					fieldtype: "Select",
 					reqd: 1,
 					options: ["Low", "Medium", "High", "Urgent"],
-					default: "Medium",
+					default: "Low",
 
 				},
 				{
