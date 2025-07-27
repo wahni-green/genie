@@ -19,7 +19,9 @@ With Genie, it's easy to raise a support ticket with screen and audio recording 
 5. Add a new button to your Settings Dropdown in NavBar Settings.
 
    Item Type should be Action and Action should be `new genie.SupportTicket()`
+6. Add another button to navigate to support portal (where ticket is created).
 
+   Item Type should be Action and Action should be `genie.OpenPortal()`
 #### License
 
 MIT
