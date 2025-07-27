@@ -8,13 +8,13 @@ from genie.utils.requests import make_request
 
 
 @frappe.whitelist()
-def create_ticket(title, description, screen_recording=None):
+def create_ticket(title, description, user, user_fullname, priority, file_attachment=None, screen_recording=None):
 	settings = frappe.get_cached_doc("Genie Settings")
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",
 	}
 
-	hd_ticket_file = None
+	attachments = []
 	if screen_recording:
 		screen_recording = f"{get_url()}{screen_recording}"
 		hd_ticket_file = make_request(
@@ -22,6 +22,16 @@ def create_ticket(title, description, screen_recording=None):
 			headers=headers,
 			payload={"file_url": screen_recording}
 		).get("message")
+		attachments.append(hd_ticket_file)
+
+	if file_attachment:
+		file_attachment = f"{get_url()}{file_attachment}"
+		file_ = make_request(
+			url=f"{settings.support_url}/api/method/upload_file",
+			headers=headers,
+			payload={"file_url": file_attachment}
+		).get("message")
+		attachments.append(file_)
 
 	hd_ticket = make_request(
 		url=f"{settings.support_url}/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
@@ -30,13 +40,33 @@ def create_ticket(title, description, screen_recording=None):
 			"doc": {
 				"description": description,
 				"subject": title,
+				"priority": priority,
+				"raised_by": user,
+				"user_fullname":user_fullname,
+				"customer": settings.hd_customer,
 				**generate_ticket_details(settings),
 			},
-			"attachments": [hd_ticket_file] if hd_ticket_file else [],
+			"attachments": attachments,
 		}
-	).get("message", {}).get("name")
+	).get("message", {})
 
-	return hd_ticket
+	# Insert into 'Support Ticket' Doctype
+	if hd_ticket.get("name"):
+		support_ticket = frappe.get_doc({
+			"doctype": "Support Ticket",
+			"title": title,
+			"status": hd_ticket.get("status"),
+			"priority": hd_ticket.get("priority"),
+			"description": hd_ticket.get("description"),
+			"raised_by": user,
+			"user_fullname": user_fullname,
+			"video_file": screen_recording if screen_recording else "",
+			"file_attachment": file_attachment if file_attachment else "",
+			"external_ticket_id": hd_ticket.get("name")  # Save external ticket ID for reference
+		})
+		support_ticket.insert(ignore_permissions=True)
+
+	return hd_ticket.get("name")
 
 
 def generate_ticket_details(settings):
