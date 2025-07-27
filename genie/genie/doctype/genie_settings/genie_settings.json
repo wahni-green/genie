@@ -11,6 +11,7 @@
   "enable_user_impersonation",
   "support_portal_section",
   "support_url",
+  "hd_customer",
   "save_recording",
   "enable_portal_access",
   "column_break_atib",
@@ -103,11 +104,16 @@
    "fieldtype": "Password",
    "label": "Portal User Password",
    "mandatory_depends_on": "enable_portal_access"
+  },
+  {
+   "fieldname": "hd_customer",
+   "fieldtype": "Data",
+   "label": "HD Customer"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-28 12:55:29.461125",
+ "modified": "2025-07-27 11:33:31.333405",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
