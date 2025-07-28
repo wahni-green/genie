@@ -104,22 +104,34 @@ def upload_file(content):
 @frappe.whitelist()
 def get_portal_url(user=frappe.session.user):
 	support_url = frappe.db.get_single_value("Genie Settings", "support_url")
-	response = make_request(
-		url=f"{support_url}/api/method/login",
-		headers={
-			"Content-Type": "application/json",
-		},
-		payload={
-			"usr": user,
-			"pwd": f"{get_fullname(user)}@123"
-		},
-		return_response=True
-	)
+	password = f"{get_fullname(user)}@123"
 
-	sid = response.cookies.get("sid")
-	return {
-		"url": f"{support_url}/helpdesk?sid={sid}"
-	}
+	try:
+		response = make_request(
+			url=f"{support_url}/api/method/login",
+			headers={
+				"Content-Type": "application/json",
+			},
+			payload={
+				"usr": user,
+				"pwd": password
+			},
+			req_type="POST",
+			return_response=True
+		)
+
+		sid = response.cookies.get("sid")
+
+		if not sid:
+			frappe.throw("Login to support portal failed: No session ID received.")
+
+		return {
+			"url": f"{support_url}/helpdesk?sid={sid}"
+		}
+
+	except Exception as e:
+		frappe.log_error(title="Support portal Login Error", message=frappe.get_traceback())
+		frappe.throw("Unable to log in to the support portal. Please try again later.")
 
 
 def create_portal_user(settings, headers, user, user_fullname):
@@ -145,7 +157,6 @@ def create_portal_user(settings, headers, user, user_fullname):
 					"email": user,
 					"first_name": user_fullname or user.split("@")[0],
 					"enabled": 1,
-					"new_password": f"{user_fullname}@123",
 					"hd_customer": settings.hd_customer,
 					"roles": [
 						{"role": "Agent"}  # or "HD Customer" if intended
