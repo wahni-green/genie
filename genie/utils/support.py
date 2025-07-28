@@ -146,27 +146,13 @@ def create_portal_user(settings, headers, user, user_fullname):
 					"first_name": user_fullname or user.split("@")[0],
 					"enabled": 1,
 					"new_password": f"{user_fullname}@123",
+					"hd_customer": settings.hd_customer,
 					"roles": [
 						{"role": "Agent"}  # or "HD Customer" if intended
 					],
-					"block_modules": []
 				},
 				req_type="POST",
 			)
 
-			# Create User Permission for HD Ticket
-			make_request(
-				url=f"{settings.support_url}/api/resource/User Permission",
-				headers=headers,
-				payload={
-					"user": user,
-					"allow": "User",
-					"for_value": user,
-					"doctype": "User Permission",
-					"apply_to_all_doctypes": 0,
-					"applicable_for": "HD Ticket"
-				},
-				req_type="POST"
-			)
 		except Exception:
 			frappe.log_error(title="Portal User Creation/Permission Failed", message=frappe.get_traceback())
