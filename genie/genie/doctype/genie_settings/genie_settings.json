@@ -92,18 +92,18 @@
    "label": "Enable Portal Access"
   },
   {
-   "depends_on": "enable_portal_access",
    "fieldname": "portal_user",
    "fieldtype": "Data",
    "label": "Portal User",
-   "mandatory_depends_on": "enable_portal_access"
+   "mandatory_depends_on": "enable_portal_access",
+   "read_only": 1
   },
   {
-   "depends_on": "enable_portal_access",
    "fieldname": "portal_user_password",
    "fieldtype": "Password",
    "label": "Portal User Password",
-   "mandatory_depends_on": "enable_portal_access"
+   "mandatory_depends_on": "enable_portal_access",
+   "read_only": 1
   },
   {
    "fieldname": "hd_customer",
@@ -113,7 +113,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2025-07-27 11:33:31.333405",
+ "modified": "2025-07-28 15:16:57.789583",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",

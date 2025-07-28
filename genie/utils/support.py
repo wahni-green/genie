@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.utils import cint, flt, get_url, now
+from frappe.utils import cint, flt, get_url, now, get_fullname
 from frappe.utils.safe_exec import get_safe_globals, safe_eval
 from genie.utils.requests import make_request
 
@@ -21,6 +21,8 @@ def create_ticket(
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",
 	}
+
+	create_portal_user(settings, headers, user, user_fullname)
 
 	attachments = []
 	if screen_recording:
@@ -50,6 +52,7 @@ def create_ticket(
 				"subject": title,
 				"priority": priority,
 				"raised_by": user,
+				"raised_by_user": user, #link field to restrict
 				"user_fullname":user_fullname,
 				"customer": settings.hd_customer,
 				**generate_ticket_details(settings),
@@ -99,21 +102,71 @@ def upload_file(content):
 
 
 @frappe.whitelist()
-def get_portal_url():
-	settings = frappe.get_cached_doc("Genie Settings")
+def get_portal_url(user=frappe.session.user):
+	support_url = frappe.db.get_single_value("Genie Settings", "support_url")
 	response = make_request(
-		url=f"{settings.support_url}/api/method/login",
+		url=f"{support_url}/api/method/login",
 		headers={
 			"Content-Type": "application/json",
 		},
 		payload={
-			"usr": settings.get_password("portal_user"),
-			"pwd": settings.get_password("portal_user_password"),
+			"usr": user,
+			"pwd": f"{get_fullname(user)}@123"
 		},
 		return_response=True
 	)
 
 	sid = response.cookies.get("sid")
 	return {
-		"url": f"{settings.support_url}/helpdesk?sid={sid}"
+		"url": f"{support_url}/helpdesk?sid={sid}"
 	}
+
+
+def create_portal_user(settings, headers, user, user_fullname):
+	# Portal Access: Check if user exists and create if not
+	user_exists = {}
+	try:
+		user_exists = make_request(
+			url=f"{settings.support_url}/api/resource/User/{user}",
+			headers=headers,
+			payload={},
+			req_type="GET"
+		)
+	except Exception as e:
+		frappe.log_error(title="Portal User Check Failed", message=frappe.get_traceback())
+
+	if not user_exists.get("data"):
+		try:
+			# Create the user
+			make_request(
+				url=f"{settings.support_url}/api/resource/User",
+				headers=headers,
+				payload={
+					"email": user,
+					"first_name": user_fullname or user.split("@")[0],
+					"enabled": 1,
+					"new_password": f"{user_fullname}@123",
+					"roles": [
+						{"role": "Agent"}  # or "HD Customer" if intended
+					],
+					"block_modules": []
+				},
+				req_type="POST",
+			)
+
+			# Create User Permission for HD Ticket
+			make_request(
+				url=f"{settings.support_url}/api/resource/User Permission",
+				headers=headers,
+				payload={
+					"user": user,
+					"allow": "User",
+					"for_value": user,
+					"doctype": "User Permission",
+					"apply_to_all_doctypes": 0,
+					"applicable_for": "HD Ticket"
+				},
+				req_type="POST"
+			)
+		except Exception:
+			frappe.log_error(title="Portal User Creation/Permission Failed", message=frappe.get_traceback())
