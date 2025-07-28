@@ -2,19 +2,29 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.utils import cint, flt, get_url, now
+from frappe.utils import cint, flt, get_url, now, get_fullname
 from frappe.utils.safe_exec import get_safe_globals, safe_eval
 from genie.utils.requests import make_request
 
 
 @frappe.whitelist()
-def create_ticket(title, description, screen_recording=None):
+def create_ticket(
+	title,
+	description,
+	screen_recording=None,
+	user=None,
+	user_fullname=None,
+	priority="Low",
+	file_attachment=None,
+):
 	settings = frappe.get_cached_doc("Genie Settings")
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",
 	}
 
-	hd_ticket_file = None
+	create_portal_user(settings, headers, user, user_fullname)
+
+	attachments = []
 	if screen_recording:
 		screen_recording = f"{get_url()}{screen_recording}"
 		hd_ticket_file = make_request(
@@ -22,6 +32,16 @@ def create_ticket(title, description, screen_recording=None):
 			headers=headers,
 			payload={"file_url": screen_recording}
 		).get("message")
+		attachments.append(hd_ticket_file)
+
+	if file_attachment:
+		file_attachment = f"{get_url()}{file_attachment}"
+		file_ = make_request(
+			url=f"{settings.support_url}/api/method/upload_file",
+			headers=headers,
+			payload={"file_url": file_attachment}
+		).get("message")
+		attachments.append(file_)
 
 	hd_ticket = make_request(
 		url=f"{settings.support_url}/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
@@ -30,9 +50,14 @@ def create_ticket(title, description, screen_recording=None):
 			"doc": {
 				"description": description,
 				"subject": title,
+				"priority": priority,
+				"raised_by": user,
+				"raised_by_user": user, #link field to restrict
+				"user_fullname":user_fullname,
+				"customer": settings.hd_customer,
 				**generate_ticket_details(settings),
 			},
-			"attachments": [hd_ticket_file] if hd_ticket_file else [],
+			"attachments": attachments,
 		}
 	).get("message", {}).get("name")
 
@@ -77,21 +102,68 @@ def upload_file(content):
 
 
 @frappe.whitelist()
-def get_portal_url():
-	settings = frappe.get_cached_doc("Genie Settings")
-	response = make_request(
-		url=f"{settings.support_url}/api/method/login",
-		headers={
-			"Content-Type": "application/json",
-		},
-		payload={
-			"usr": settings.get_password("portal_user"),
-			"pwd": settings.get_password("portal_user_password"),
-		},
-		return_response=True
-	)
+def get_portal_url(user=frappe.session.user):
+	support_url = frappe.db.get_single_value("Genie Settings", "support_url")
+	password = f"{get_fullname(user)}@123"
 
-	sid = response.cookies.get("sid")
-	return {
-		"url": f"{settings.support_url}/helpdesk?sid={sid}"
-	}
+	try:
+		response = make_request(
+			url=f"{support_url}/api/method/login",
+			headers={
+				"Content-Type": "application/json",
+			},
+			payload={
+				"usr": user,
+				"pwd": password
+			},
+			req_type="POST",
+			return_response=True
+		)
+
+		sid = response.cookies.get("sid")
+
+		if not sid:
+			frappe.throw("Login to support portal failed: No session ID received.")
+
+		return {
+			"url": f"{support_url}/helpdesk?sid={sid}"
+		}
+
+	except Exception as e:
+		frappe.log_error(title="Support portal Login Error", message=frappe.get_traceback())
+		frappe.throw("Unable to log in to the support portal. Please try again later.")
+
+
+def create_portal_user(settings, headers, user, user_fullname):
+	# Portal Access: Check if user exists and create if not
+	user_exists = {}
+	try:
+		user_exists = make_request(
+			url=f"{settings.support_url}/api/resource/User/{user}",
+			headers=headers,
+			payload={},
+			req_type="GET"
+		)
+	except Exception as e:
+		frappe.log_error(title="Portal User Check Failed", message=frappe.get_traceback())
+
+	if not user_exists.get("data"):
+		try:
+			# Create the user
+			make_request(
+				url=f"{settings.support_url}/api/resource/User",
+				headers=headers,
+				payload={
+					"email": user,
+					"first_name": user_fullname or user.split("@")[0],
+					"enabled": 1,
+					"hd_customer": settings.hd_customer,
+					"roles": [
+						{"role": "Agent"}  # or "HD Customer" if intended
+					],
+				},
+				req_type="POST",
+			)
+
+		except Exception:
+			frappe.log_error(title="Portal User Creation/Permission Failed", message=frappe.get_traceback())

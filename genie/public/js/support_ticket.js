@@ -33,10 +33,58 @@ genie.SupportTicket = class SupportTicket {
 					reqd: 1
 				},
 				{
+					fieldtype: "Column Break"
+				},
+				{
+					fieldname: "priority",
+					label: __("Priority"),
+					fieldtype: "Select",
+					reqd: 1,
+					options: ["Low", "Medium", "High", "Urgent"],
+					default: "Low",
+
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("User Details")
+				},
+				{
+					fieldname: "ticket_email",
+					label: __("Email"),
+					fieldtype: "Read Only",
+					reqd: 1,
+					default: frappe.session.user_email,
+
+				},
+				{
+					fieldtype: "Column Break"
+				},
+				{
+					fieldname: "ticket_user",
+					label: __("User"),
+					fieldtype: "Read Only",
+					reqd: 1,
+					default: frappe.session.user_fullname,
+
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("Description")
+				},
+				{
 					fieldname: "ticket_description",
 					label: __("Description"),
 					fieldtype: "Text Editor",
 					reqd: 1
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("Attachment")
+				},
+				{
+					fieldname: "file_attachment",
+					label: __("Attachment"),
+					fieldtype: "Attach",
 				},
 				{
 					fieldtype: "Section Break",
@@ -45,6 +93,7 @@ genie.SupportTicket = class SupportTicket {
 				{
 					fieldname: "record_screen",
 					label: __("Start Recording"),
+					description:"Prefer to speak? Raise your issue using voice while recording.",
 					fieldtype: "Button",
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
@@ -158,7 +207,12 @@ genie.SupportTicket = class SupportTicket {
 			type: "POST",
 			args: {
 				"title": values.ticket_title,
+				"status": "Open",
+				"priority": values.priority,
+				"user": values.ticket_email,
+				"user_fullname": values.ticket_user,
 				"description": values.ticket_description,
+				"file_attachment": values.file_attachment,
 				"screen_recording": screen_recording
 			},
 			freeze: true,

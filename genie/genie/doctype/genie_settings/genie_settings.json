@@ -11,6 +11,7 @@
   "enable_user_impersonation",
   "support_portal_section",
   "support_url",
+  "hd_customer",
   "save_recording",
   "enable_portal_access",
   "column_break_atib",
@@ -91,23 +92,28 @@
    "label": "Enable Portal Access"
   },
   {
-   "depends_on": "enable_portal_access",
    "fieldname": "portal_user",
    "fieldtype": "Data",
    "label": "Portal User",
-   "mandatory_depends_on": "enable_portal_access"
+   "mandatory_depends_on": "enable_portal_access",
+   "read_only": 1
   },
   {
-   "depends_on": "enable_portal_access",
    "fieldname": "portal_user_password",
    "fieldtype": "Password",
    "label": "Portal User Password",
-   "mandatory_depends_on": "enable_portal_access"
+   "mandatory_depends_on": "enable_portal_access",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hd_customer",
+   "fieldtype": "Data",
+   "label": "HD Customer"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-28 12:55:29.461125",
+ "modified": "2025-07-28 15:16:57.789583",
  "modified_by": "Administrator",
  "module": "Genie",
  "name": "Genie Settings",
