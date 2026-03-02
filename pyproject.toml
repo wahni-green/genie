@@ -1,0 +1,17 @@
+[project]
+name = "genie"
+authors = [
+    { name = "Wahni IT Solutions Pvt Ltd", email = "support@wahni.com"}
+]
+description = "Your guide to unlocking full potential of ERPNext"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = []
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=14.0.0,<18.0.0"
