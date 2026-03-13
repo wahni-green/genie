@@ -19,7 +19,7 @@ genie.SupportTicket = class SupportTicket {
 		this.dialog.show();
 	}
 
-	setup_dialog() {
+	async setup_dialog() {
 		this.dialog = new frappe.ui.Dialog({
 			title: __("Support Ticket"),
 			size: "large",
@@ -33,6 +33,54 @@ genie.SupportTicket = class SupportTicket {
 					reqd: 1
 				},
 				{
+					fieldtype: "Column Break"
+				},
+				{
+					fieldname: "priority",
+					label: __("Priority"),
+					fieldtype: "Select",
+					reqd: 1,
+					options: ["Low", "Medium", "High", "Urgent"],
+					default: "Low",
+
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("User Details")
+				},
+				{
+					fieldname: "ticket_email",
+					label: __("Email"),
+					fieldtype: "Read Only",
+					reqd: 1,
+					default: frappe.session.user_email,
+
+				},
+				{
+					fieldtype: "Column Break"
+				},
+				{
+					fieldname: "ticket_user",
+					label: __("User"),
+					fieldtype: "Read Only",
+					reqd: 1,
+					default: frappe.session.user_fullname,
+
+				},
+				{
+					fieldtype: "Column Break"
+				},
+				{
+					fieldname: "department",
+					label: __("Department"),
+					fieldtype: "Link",
+					options: "Department",
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("Description")
+				},
+				{
 					fieldname: "ticket_description",
 					label: __("Description"),
 					fieldtype: "Text Editor",
@@ -40,11 +88,22 @@ genie.SupportTicket = class SupportTicket {
 				},
 				{
 					fieldtype: "Section Break",
-					label: __("Screen Recording")
+					label: __("Attachment")
+				},
+				{
+					fieldname: "file_attachment",
+					label: __("Attachment"),
+					fieldtype: "Attach",
+				},
+				{
+					fieldtype: "Section Break",
+					label: __("Screen Recording"),
+					hidden: 1,
 				},
 				{
 					fieldname: "record_screen",
 					label: __("Start Recording"),
+					description:"Prefer to speak? Raise your issue using voice while recording.",
 					fieldtype: "Button",
 					click: () => {
 						if (this.recorder && this.recorder.state == "recording") {
@@ -119,7 +178,13 @@ genie.SupportTicket = class SupportTicket {
 
 		this.dialog.$wrapper.find(".modal-dialog").css("z-index", 1);
 		this.dialog.get_minimize_btn().addClass("pr-3");
+
+		const r = await frappe.db.get_value("Employee", { user_id: frappe.session.user }, "department");
+		if (r.message && r.message.department) {
+			this.dialog.set_value("department", r.message.department);
+		}
 	}
+
 
 	setIndicator(indicator) {
 		this.dialog.header
@@ -130,7 +195,6 @@ genie.SupportTicket = class SupportTicket {
 	}
 
 	async raise_ticket(values) {
-		console.log(this.inUpload)
 		if (this.inUpload) return;
 
 		this.inUpload = true;
@@ -158,7 +222,13 @@ genie.SupportTicket = class SupportTicket {
 			type: "POST",
 			args: {
 				"title": values.ticket_title,
+				"status": "Open",
+				"priority": values.priority,
+				"user": values.ticket_email,
+				"user_fullname": values.ticket_user,
 				"description": values.ticket_description,
+				"file_attachment": values.file_attachment,
+				"department": values.department,
 				"screen_recording": screen_recording
 			},
 			freeze: true,
@@ -167,7 +237,7 @@ genie.SupportTicket = class SupportTicket {
 				if (!r.exc && r.message) {
 					frappe.show_alert({
 						indicator: "green",
-						message: __("Ticket raised successfully"),
+						message: __(`Ticket raised successfully Ticket ID: ${r.message}`),
 					});
 					this.dialog.hide();
 					frappe.msgprint(

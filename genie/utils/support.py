@@ -1,42 +1,118 @@
-# Copyright (c) 2023, Wahni IT Solutions Pvt. Ltd. and contributors
+# Copyright (c) 2023, Wahni IT Solutions Pvt. Ltd.
 # For license information, please see license.txt
 
 import frappe
+import json
+
 from frappe.utils import cint, flt, get_url, now
 from frappe.utils.safe_exec import get_safe_globals, safe_eval
+
 from genie.utils.requests import make_request
 
 
 @frappe.whitelist()
-def create_ticket(title, description, screen_recording=None):
+def create_ticket(
+	title,
+	description,
+	screen_recording=None,
+	user=None,
+	user_fullname=None,
+	priority="Low",
+	file_attachment=None,
+	department=None,
+):
+	"""Create ticket in Opero Support Portal"""
 	settings = frappe.get_cached_doc("Genie Settings")
 	headers = {
 		"Authorization": f"token {settings.get_password('support_api_token')}",
 	}
 
-	hd_ticket_file = None
+	ensure_portal_user(settings, headers, user, user_fullname)
+
+	attachments = []
+
 	if screen_recording:
 		screen_recording = f"{get_url()}{screen_recording}"
-		hd_ticket_file = make_request(
-			url=f"{settings.support_url}/api/method/upload_file",
+
+		file_data = make_request(
+			url=f"{settings.support_url.rstrip('/')}/api/method/upload_file",
 			headers=headers,
-			payload={"file_url": screen_recording}
+			payload={"file_url": screen_recording},
 		).get("message")
 
-	hd_ticket = make_request(
-		url=f"{settings.support_url}/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new",
+		attachments.append(file_data)
+
+	if file_attachment:
+		file_attachment = f"{get_url()}{file_attachment}"
+
+		file_data = make_request(
+			url=f"{settings.support_url.rstrip('/')}/api/method/upload_file",
+			headers=headers,
+			payload={"file_url": file_attachment},
+		).get("message")
+
+		attachments.append(file_data)
+
+	response = make_request(
+		url=f"{settings.support_url.rstrip('/')}/api/method/opero.api.ticket.create_opero_ticket",
 		headers=headers,
 		payload={
 			"doc": {
 				"description": description,
 				"subject": title,
+				"priority": priority,
+				"raised_by": user,
+				"raised_by_user": user,
+				"user_fullname": user_fullname,
+				"customer": settings.hd_customer,
+				"department": department,
+				"ticket_type": "Support",
 				**generate_ticket_details(settings),
 			},
-			"attachments": [hd_ticket_file] if hd_ticket_file else [],
-		}
-	).get("message", {}).get("name")
+			"attachments": attachments,
+		},
+	)
 
-	return hd_ticket
+	return response.get("message")
+
+
+def ensure_portal_user(settings, headers, user, user_fullname):
+	"""Ensure portal user exists in Opero"""
+
+	if not user:
+		return
+
+	try:
+		user_data = make_request(
+			url=f"{settings.support_url.rstrip('/')}/api/method/opero.api.ticket.check_portal_user",
+			headers=headers,
+			payload={
+				"email": user
+			},
+			req_type="GET",
+		)
+
+		if user_data.get("data"):
+			return
+
+	except Exception:
+		pass
+
+
+	make_request(
+		url=f"{settings.support_url.rstrip('/')}/api/method/opero.api.ticket.create_portal_user",
+		headers=headers,
+		payload={
+			"email": user,
+			"first_name": user_fullname or user.split("@")[0],
+			"enabled": 1,
+			"hd_customer": settings.hd_customer,
+			"roles": [
+				{"role": "Opero Ticket Raiser"}
+			],
+		},
+		req_type="POST",
+	)
 
 
 def generate_ticket_details(settings):
@@ -77,21 +153,20 @@ def upload_file(content):
 
 
 @frappe.whitelist()
-def get_portal_url():
-	settings = frappe.get_cached_doc("Genie Settings")
-	response = make_request(
-		url=f"{settings.support_url}/api/method/login",
-		headers={
-			"Content-Type": "application/json",
-		},
-		payload={
-			"usr": settings.get_password("portal_user"),
-			"pwd": settings.get_password("portal_user_password"),
-		},
-		return_response=True
-	)
+def get_portal_url(user=frappe.session.user):
+	support_url = frappe.db.get_single_value("Genie Settings", "support_url")
 
-	sid = response.cookies.get("sid")
-	return {
-		"url": f"{settings.support_url}/helpdesk?sid={sid}"
-	}
+	try:
+		return {
+			"url": f"{support_url}/opero/opero/account/login"
+		}
+
+	except Exception:
+		frappe.log_error(
+			title="Support Portal Login Error",
+			message=frappe.get_traceback(),
+		)
+
+		frappe.throw(
+			"Unable to log in to the support portal. Please try again later."
+		)
